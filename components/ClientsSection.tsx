@@ -343,7 +343,7 @@ export default function ClientsSection({
       fetchGreenLogs();
     } catch (err: any) {
       setGreenTestResult({ success: false, error: err.message });
-    } font-mono {
+    } finally {
       setIsSendingGreenTest(false);
     }
   };
