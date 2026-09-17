@@ -3,7 +3,7 @@ import {
   processGreenWebhookPayload,
   getWebhookLogs,
   getWebhookCards,
-} from '../../../../lib/webhookStore';
+} from '@/lib/webhookStore';
 
 export async function POST(req: Request) {
   try {

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { handleMetaAdsApiRequest } from '../../../lib/metaAdsService';
+import { handleMetaAdsApiRequest } from '@/lib/metaAdsService';
 
 export async function POST(req: Request) {
   try {

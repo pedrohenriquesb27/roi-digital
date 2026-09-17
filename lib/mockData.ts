@@ -180,3 +180,6 @@ export const mockDailyTrends = [
   { date: '16/09', sales: 26, revenue: 3490, spend: 590, roas: 5.91 },
   { date: '17/09', sales: 34, revenue: 4680, spend: 710, roas: 6.59 },
 ];
+
+export const initialClients = mockClients;
+export const initialTransactions = mockTransactions;

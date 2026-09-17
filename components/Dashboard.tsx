@@ -86,10 +86,10 @@ export default function Dashboard() {
             setTransactions((prevTx) => {
               const webhookTxs: Transaction[] = data.transactions;
               const map = new Map<string, Transaction>();
-              webhookTxs.forEach((t) => map.set(t.code, t));
+              webhookTxs.forEach((t) => map.set(t.id, t));
               prevTx.forEach((t) => {
-                if (!map.has(t.code)) {
-                  map.set(t.code, t);
+                if (!map.has(t.id)) {
+                  map.set(t.id, t);
                 }
               });
               return Array.from(map.values());

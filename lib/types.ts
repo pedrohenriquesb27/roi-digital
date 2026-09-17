@@ -65,3 +65,17 @@ export interface WebhookLog {
   buyerName: string;
   clientId?: string;
 }
+
+export type PeriodFilter = 'hoje' | '7dias' | '30dias' | 'este_mes';
+
+export interface NotificationAlert {
+  id: string;
+  title: string;
+  description: string;
+  category: 'CONVERSION' | 'CPA' | 'INTEGRATION' | 'INACTIVITY';
+  severity: 'CRITICAL' | 'WARNING' | 'INFO';
+  timestamp: string;
+  isRead: boolean;
+  actionLabel?: string;
+  targetTab?: string;
+}
