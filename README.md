@@ -1,3 +1,3 @@
-# ROI DIGITAL - Dashboard de Vendas & Meta Ads
+# ROI DIGITAL — Dashboard de Métricas de Vendas & Meta Ads
 
-Dashboard completo de gestão de vendas, integração com Green Gateway (Webhooks), Meta Ads API (Facebook & Instagram) e cadastro rápido de clientes.
+Painel completo e inteligente para gestão de clientes, tráfego pago no Meta Ads e webhooks de vendas via Green Gateway.
