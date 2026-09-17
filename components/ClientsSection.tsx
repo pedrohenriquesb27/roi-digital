@@ -369,7 +369,7 @@ export default function ClientsSection({
       }
     } catch (err: any) {
       setMetaTestResult({ success: false, message: 'Erro de conexão: ' + err.message });
-    } fontally {
+    } finally {
       setIsTestingMeta(false);
     }
   };
