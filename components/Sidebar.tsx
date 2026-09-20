@@ -12,6 +12,7 @@ import {
   LogOut,
   Zap,
   Tag,
+  Link as LinkIcon,
 } from 'lucide-react';
 import RoiLogo from './RoiLogo';
 
@@ -21,6 +22,7 @@ export type NavTabId =
   | 'meta'
   | 'simulator'
   | 'report'
+  | 'utm'
   | 'clients'
   | 'webhook'
   | 'config';
@@ -69,6 +71,12 @@ export default function Sidebar({
       id: 'report' as NavTabId,
       label: 'Relatórios PDF',
       icon: FileSpreadsheet,
+    },
+    {
+      id: 'utm' as NavTabId,
+      label: 'Códigos de UTM',
+      icon: LinkIcon,
+      badge: 'Gerador',
     },
     {
       id: 'clients' as NavTabId,
