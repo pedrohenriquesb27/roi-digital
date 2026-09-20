@@ -1,130 +1,12 @@
 import { Client, MetaCampaign, Transaction } from './types';
 
-export const mockClients: Client[] = [
-  {
-    id: 'cli_01',
-    name: 'Carlos Eduardo Silva',
-    companyName: 'E-commerce Brasil Ltda',
-    email: 'carlos@ecommercebrasil.com.br',
-    phone: '(11) 98765-4321',
-    adAccountId: 'act_389201948',
-    metaAccessToken: 'EAAG982301984719283719238',
-    pixelId: '98201948102',
-    status: 'ACTIVE',
-    createdAt: '12/01/2026',
-    hoursWithoutSales: 2,
-    totalSalesCount: 142,
-    totalRevenue: 34500,
-  },
-  {
-    id: 'cli_02',
-    name: 'Mariana Fontes',
-    companyName: 'Instituto Estética Premium',
-    email: 'contato@esteticapremium.com.br',
-    phone: '(21) 99887-1122',
-    adAccountId: 'act_991823741',
-    metaAccessToken: 'EAAG123456789012345678901',
-    pixelId: '10293847561',
-    status: 'ACTIVE',
-    createdAt: '01/02/2026',
-    hoursWithoutSales: 26,
-    totalSalesCount: 88,
-    totalRevenue: 21900,
-  },
-  {
-    id: 'cli_03',
-    name: 'Roberto Mendes',
-    companyName: 'Mentoria High Ticket',
-    email: 'roberto@mentoriahighticket.com',
-    phone: '(31) 97766-5544',
-    adAccountId: 'act_773645192',
-    metaAccessToken: 'EAAG998877665544332211009',
-    pixelId: '55443322110',
-    status: 'ACTIVE',
-    createdAt: '18/02/2026',
-    hoursWithoutSales: 5,
-    totalSalesCount: 29,
-    totalRevenue: 58000,
-  },
-];
+// A lista inicial de clientes nasce totalmente vazia ([]), pronta para exibir apenas clientes reais cadastrados
+export const mockClients: Client[] = [];
+export const initialClients: Client[] = [];
 
-export const mockTransactions: Transaction[] = [
-  {
-    id: 'GRN-982019',
-    amount: 197.0,
-    status: 'APROVADO',
-    paymentMethod: 'PIX',
-    buyerName: 'Fernando Alcantara',
-    buyerEmail: 'fernando.alcantara@email.com',
-    productName: 'Checkup Financeiro Completo',
-    timestamp: 'Há 5 minutos',
-    utmSource: 'facebook',
-    utmCampaign: 'cbo_escala_vendas',
-    utmContent: 'criativo_v3_depoimento',
-    hasOrderbump: true,
-    clientId: 'cli_01',
-  },
-  {
-    id: 'GRN-982018',
-    amount: 97.0,
-    status: 'APROVADO',
-    paymentMethod: 'CARTAO',
-    buyerName: 'Juliana Costa',
-    buyerEmail: 'juliana.costa@gmail.com',
-    productName: 'Checkup Financeiro Completo',
-    timestamp: 'Há 18 minutos',
-    utmSource: 'facebook',
-    utmCampaign: 'cbo_escala_vendas',
-    utmContent: 'criativo_v1_estatica',
-    hasOrderbump: false,
-    clientId: 'cli_01',
-  },
-  {
-    id: 'GRN-982017',
-    amount: 147.0,
-    status: 'ABANDONADO',
-    paymentMethod: 'CARTAO',
-    buyerName: 'Lucas Pedrosa',
-    buyerEmail: 'pedrosa.lucas@outlook.com',
-    productName: 'Checkup Financeiro Completo',
-    timestamp: 'Há 32 minutos',
-    utmSource: 'instagram',
-    utmCampaign: 'retargeting_stories',
-    utmContent: 'stories_urgencia',
-    hasOrderbump: true,
-    clientId: 'cli_02',
-  },
-  {
-    id: 'GRN-982016',
-    amount: 97.0,
-    status: 'PENDENTE',
-    paymentMethod: 'PIX',
-    buyerName: 'Patricia Gomes',
-    buyerEmail: 'patricia.gomes@yahoo.com.br',
-    productName: 'Checkup Financeiro Completo',
-    timestamp: 'Há 45 minutos',
-    utmSource: 'facebook',
-    utmCampaign: 'broad_sem_filtro',
-    utmContent: 'video_chamada_direta',
-    hasOrderbump: false,
-    clientId: 'cli_01',
-  },
-  {
-    id: 'GRN-982015',
-    amount: 297.0,
-    status: 'APROVADO',
-    paymentMethod: 'PIX',
-    buyerName: 'Rodrigo Vasconcelos',
-    buyerEmail: 'rodrigo.vasco@empresa.com',
-    productName: 'Mentoria Express',
-    timestamp: 'Há 1 hora',
-    utmSource: 'google_ads',
-    utmCampaign: 'search_marca',
-    utmContent: 'anuncio_palavra_chave',
-    hasOrderbump: true,
-    clientId: 'cli_03',
-  },
-];
+export const mockTransactions: Transaction[] = [];
+
+export const initialTransactions: Transaction[] = mockTransactions;
 
 export const mockMetaCampaigns: MetaCampaign[] = [
   {
@@ -155,20 +37,6 @@ export const mockMetaCampaigns: MetaCampaign[] = [
     roas: 6.45,
     adAccountId: 'act_389201948',
   },
-  {
-    id: 'cmp_103',
-    name: '[TESTE] Criativos em Video — IA UGC',
-    status: 'PAUSED',
-    spend: 310.0,
-    impressions: 8900,
-    clicks: 195,
-    ctr: 2.19,
-    cpc: 1.58,
-    conversions: 3,
-    costPerConversion: 103.33,
-    roas: 0.94,
-    adAccountId: 'act_389201948',
-  },
 ];
 
 export const mockDailyTrends = [
@@ -180,6 +48,3 @@ export const mockDailyTrends = [
   { date: '16/09', sales: 26, revenue: 3490, spend: 590, roas: 5.91 },
   { date: '17/09', sales: 34, revenue: 4680, spend: 710, roas: 6.59 },
 ];
-
-export const initialClients = mockClients;
-export const initialTransactions = mockTransactions;
