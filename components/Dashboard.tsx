@@ -58,13 +58,40 @@ export default function Dashboard() {
   const [showSplash, setShowSplash] = useState(true);
   const [activeTab, setActiveTab] = useState<NavTabId>('overview');
   const [period, setPeriod] = useState<PeriodFilter>('30dias');
-  const [clients, setClients] = useState<Client[]>(initialClients);
+  const [clients, setClients] = useState<Client[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('roi_digital_clients');
+      if (saved) {
+        try {
+          const parsed: Client[] = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            // Remove legacy mock clients (cli_01, cli_02, cli_03) if present
+            const realOnly = parsed.filter(
+              (c) => c.id !== 'cli_01' && c.id !== 'cli_02' && c.id !== 'cli_03'
+            );
+            return realOnly;
+          }
+        } catch (e) {
+          console.error('[Dashboard Clients Load Error]:', e);
+        }
+      }
+    }
+    return initialClients; // []
+  });
+
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const [isAlertDismissed, setIsAlertDismissed] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
+
+  // Persistence effect: saves clients state to localStorage whenever modified
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('roi_digital_clients', JSON.stringify(clients));
+    }
+  }, [clients]);
 
   useEffect(() => {
     const authSession = localStorage.getItem('roi_digital_authenticated');
