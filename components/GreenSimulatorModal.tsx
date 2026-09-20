@@ -34,9 +34,13 @@ export default function GreenSimulatorModal({ isOpen, onClose }: GreenSimulatorM
     };
 
     try {
-      const res = await fetch('/api/webhook/green', {
+      const res = await fetch('/api/webhook/green?client_id=cli_01&secret=whsec_green_9823019847192837', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-conectai-client-id': 'cli_01',
+          'x-webhook-secret': 'whsec_green_9823019847192837',
+        },
         body: JSON.stringify(payload),
       });
       const data = await res.json();

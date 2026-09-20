@@ -26,6 +26,11 @@ export interface Client {
   adAccountId?: string;
   metaAccessToken?: string;
   pixelId?: string;
+  webhookSecret?: string;
+  gateway_config?: {
+    webhookSecret?: string;
+    activeGateway?: string;
+  };
   status: 'ACTIVE' | 'INACTIVE';
   createdAt: string;
   hoursWithoutSales?: number;
@@ -64,6 +69,20 @@ export interface WebhookLog {
   paymentMethod: string;
   buyerName: string;
   clientId?: string;
+}
+
+// Tabela de Logs Crus para Auditoria (sd_webhook_logs)
+export interface WebhookAuditLog {
+  id: string;
+  received_at: string;
+  endpoint: string;
+  client_id: string | null;
+  raw_payload: any;
+  headers: Record<string, string>;
+  query_params: Record<string, string>;
+  processed: boolean;
+  status_code: number;
+  error_reason?: string;
 }
 
 export type PeriodFilter = 'hoje' | '7dias' | '30dias' | 'este_mes';
