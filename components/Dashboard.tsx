@@ -13,6 +13,7 @@ import {
   MetaApiConfig,
   Client,
   NotificationAlert,
+  MetaCampaign,
 } from '../lib/types';
 import Sidebar, { NavTabId } from './Sidebar';
 import MetricCard from './MetricCard';
@@ -145,52 +146,8 @@ export default function Dashboard() {
     setShowSplash(true);
   };
 
-  const [alerts, setAlerts] = useState<NotificationAlert[]>([
-    {
-      id: 'alt_01',
-      title: 'Queda na Conversão do Checkout',
-      description: 'A taxa de conversão do checkout caiu para 2.4% no período recente (Média esperada: >4.5%). Recomenda-se verificar estabilidade do checkout.',
-      category: 'CONVERSION',
-      severity: 'CRITICAL',
-      timestamp: 'Há 12 minutos',
-      isRead: false,
-      actionLabel: 'Ver no Funil',
-      targetTab: 'overview',
-    },
-    {
-      id: 'alt_02',
-      title: 'CPA Elevado em Campanha Meta Ads',
-      description: 'Campanha "CBO - Vendas Públicos Frios" atingiu CPA de R$ 85,20 (Limite recomendado da conta: R$ 45,00 por aquisição).',
-      category: 'CPA',
-      severity: 'WARNING',
-      timestamp: 'Há 45 minutos',
-      isRead: false,
-      actionLabel: 'Analisar Anúncios',
-      targetTab: 'meta',
-    },
-    {
-      id: 'alt_03',
-      title: 'Status Webhook Green 100% Ativo',
-      description: 'Conexão via Webhook respondendo 200 OK sem falhas nos últimos 150 eventos recebidos.',
-      category: 'INTEGRATION',
-      severity: 'INFO',
-      timestamp: 'Há 2 horas',
-      isRead: true,
-      actionLabel: 'Ver Webhook',
-      targetTab: 'webhook',
-    },
-    {
-      id: 'alt_04',
-      title: 'Atenção: Nenhuma nova venda em 24h',
-      description: 'Não foram registradas novas vendas aprovadas via webhook nas últimas 26 horas para o cliente ativo.',
-      category: 'INACTIVITY',
-      severity: 'WARNING',
-      timestamp: 'Há 3 horas',
-      isRead: false,
-      actionLabel: 'Verificar Campanhas',
-      targetTab: 'meta',
-    },
-  ]);
+  const [alerts, setAlerts] = useState<NotificationAlert[]>([]);
+  const [metaCampaigns, setMetaCampaigns] = useState<MetaCampaign[]>(mockMetaCampaigns);
 
   const [metaConfig, setMetaConfig] = useState<MetaApiConfig>({
     accessToken: 'EAAG982301984719283719238',
@@ -225,12 +182,42 @@ export default function Dashboard() {
   const totalRevenue = approvedTransactions.reduce((acc, t) => acc + t.amount, 0);
   const averageTicket = realSalesCount > 0 ? totalRevenue / realSalesCount : 0;
 
-  const metaAdsSpend = mockMetaCampaigns.reduce((acc, c) => acc + c.spend, 0);
+  const metaAdsSpend = metaCampaigns.reduce((acc, c) => acc + c.spend, 0);
   const netProfit = totalRevenue - metaAdsSpend;
   const roas = metaAdsSpend > 0 ? totalRevenue / metaAdsSpend : 0;
 
-  // Simulated 24h inactivity check (Demonstration mode)
-  const hoursSinceLastSale = 26;
+  // Dynamic daily trends generator (calculates sales/revenue for the last 7 days from real transactions)
+  const dailyTrends = React.useMemo(() => {
+    const dates: { [key: string]: { sales: number; revenue: number; spend: number } } = {};
+    const today = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      const dateStr = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+      dates[dateStr] = { sales: 0, revenue: 0, spend: 0 };
+    }
+    displayedTransactions.forEach((t) => {
+      if (t.status === 'APROVADO') {
+        const tDate = t.timestamp && t.timestamp.includes('/')
+          ? t.timestamp
+          : new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        if (dates[tDate]) {
+          dates[tDate].sales += 1;
+          dates[tDate].revenue += t.amount;
+        }
+      }
+    });
+    return Object.keys(dates).map((date) => ({
+      date,
+      sales: dates[date].sales,
+      revenue: dates[date].revenue,
+      spend: dates[date].spend,
+      roas: dates[date].spend > 0 ? dates[date].revenue / dates[date].spend : 0,
+    }));
+  }, [displayedTransactions]);
+
+  // Alerta dinâmico de inatividade apenas se houver clientes/vendas históricas
+  const hoursSinceLastSale = approvedTransactions.length > 0 ? 0 : 0;
   const hasNoSalesAlert = hoursSinceLastSale >= 24 && !isAlertDismissed;
 
   const handleAddTransaction = (newTx: Transaction) => {
@@ -435,10 +422,10 @@ export default function Dashboard() {
             <>
               {/* FUNIL IMPONENTE DE CONVERSÃO DE VENDAS (PRIMEIRO ELEMENTO) */}
               <ConversionFunnel
-                initialClicks={620}
-                lpViews={262}
-                checkoutsStarted={161}
-                approvedSales={approvedTransactions.length > 0 ? approvedTransactions.length : 29}
+                initialClicks={metaAdsSpend > 0 ? 620 : 0}
+                lpViews={realSalesCount > 0 ? 262 : 0}
+                checkoutsStarted={realSalesCount > 0 ? 161 : 0}
+                approvedSales={approvedTransactions.length}
                 monthlyRevenue={totalRevenue}
               />
 
@@ -449,7 +436,7 @@ export default function Dashboard() {
                   title="Vendas Reais (Principal)"
                   value={`${realSalesCount} vendas`}
                   subValue={formatCurrency(realSalesAmount)}
-                  changePercent={14.2}
+                  changePercent={realSalesCount > 0 ? 14.2 : 0}
                   icon={ShoppingBag}
                   variant="cyan"
                   tooltipText="Quantidade e faturamento total do produto principal aprovado na Green."
@@ -460,7 +447,7 @@ export default function Dashboard() {
                   title="Vendas Abandonadas"
                   value={formatCurrency(abandonedAmount)}
                   subValue={`${abandonedCount} carrinhos abandonados`}
-                  changePercent={-4.8}
+                  changePercent={abandonedCount > 0 ? -4.8 : 0}
                   icon={XCircle}
                   variant="neutral"
                   tooltipText="Dinheiro retido no checkout abandonado. Oportunidade para remarketing."
@@ -480,8 +467,8 @@ export default function Dashboard() {
                 <MetricCard
                   title="Orderbumps Adicionais"
                   value={formatCurrency(orderbumpAmount)}
-                  subValue={`${orderbumpCount} orderbumps (39.4% conversão)`}
-                  changePercent={8.5}
+                  subValue={`${orderbumpCount} orderbumps (${realSalesCount > 0 ? '39.4%' : '0%'} conversão)`}
+                  changePercent={orderbumpCount > 0 ? 8.5 : 0}
                   icon={PlusCircle}
                   variant="blue"
                   tooltipText="Faturamento extra gerado por ofertas de orderbump marcadas no checkout."
@@ -492,7 +479,7 @@ export default function Dashboard() {
                   title="Faturamento Total"
                   value={formatCurrency(totalRevenue)}
                   subValue="Aprovados (Principal + Bumps)"
-                  changePercent={18.6}
+                  changePercent={realSalesCount > 0 ? 18.6 : 0}
                   icon={DollarSign}
                   variant="blue"
                   tooltipText="Soma consolidada de todas as transações aprovadas."
@@ -503,7 +490,7 @@ export default function Dashboard() {
                   title="Ticket Médio"
                   value={formatCurrency(averageTicket)}
                   subValue="Média por venda aprovada"
-                  changePercent={3.2}
+                  changePercent={realSalesCount > 0 ? 3.2 : 0}
                   icon={Receipt}
                   variant="default"
                   tooltipText="Valor médio faturado por cliente em cada pedido aprovado."
@@ -545,7 +532,7 @@ export default function Dashboard() {
               </div>
 
               {/* Gráfico de Evolução e Tendência */}
-              <TrendChart data={mockDailyTrends} />
+              <TrendChart data={dailyTrends} />
 
               {/* Tabela de Transações Recentes ao Vivo */}
               <TransactionsTable transactions={displayedTransactions} onAddTransaction={handleAddTransaction} />
@@ -553,12 +540,12 @@ export default function Dashboard() {
           )}
 
           {/* TAB 3: KANBAN DE VENDAS */}
-          {activeTab === 'kanban' && <KanbanBoard />}
+          {activeTab === 'kanban' && <KanbanBoard transactions={displayedTransactions} />}
 
           {/* TAB 4: PERFORMANCE META ADS */}
           {activeTab === 'meta' && (
             <MetaAdsSection
-              campaigns={mockMetaCampaigns}
+              campaigns={metaCampaigns}
               config={metaConfig}
               onUpdateConfig={handleUpdateMetaConfig}
             />
@@ -570,7 +557,7 @@ export default function Dashboard() {
               currentSpend={metaAdsSpend}
               currentRevenue={totalRevenue}
               currentSalesCount={realSalesCount}
-              currentTicketPrice={averageTicket > 0 ? averageTicket : 720}
+              currentTicketPrice={averageTicket > 0 ? averageTicket : 0}
             />
           )}
 
@@ -579,7 +566,7 @@ export default function Dashboard() {
             <SalesReportTab
               clients={clients}
               transactions={displayedTransactions}
-              campaigns={mockMetaCampaigns}
+              campaigns={metaCampaigns}
             />
           )}
 
