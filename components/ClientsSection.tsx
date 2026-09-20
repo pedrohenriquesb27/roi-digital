@@ -462,141 +462,162 @@ export default function ClientsSection({
           </div>
         </div>
 
-        {/* Cards Grid Limpo dos Clientes */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredClients.map((client) => {
-            const isSelected = selectedClientId === client.id;
-            const hasNoSalesAlert = (client.hoursWithoutSales || 0) >= 24;
+        {/* Cards Grid Limpo dos Clientes ou Empty State */}
+        {filteredClients.length === 0 ? (
+          <div className="glass-card rounded-2xl p-12 text-center border border-white/10 space-y-4 bg-slate-900/40">
+            <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 flex items-center justify-center mx-auto shadow-lg shadow-cyan-500/10">
+              <Users className="w-7 h-7" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-base font-bold text-white">Nenhum cliente cadastrado</h3>
+              <p className="text-xs text-slate-400 max-w-md mx-auto">
+                Sua carteira de clientes está totalmente pronta para uso. Clique no botão abaixo para cadastrar seu primeiro cliente real.
+              </p>
+            </div>
+            <button
+              onClick={() => setViewState('create')}
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-cyan-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-cyan-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all"
+            >
+              <Plus className="w-4 h-4 stroke-[3]" />
+              <span>+ Novo Cliente</span>
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filteredClients.map((client) => {
+              const isSelected = selectedClientId === client.id;
+              const hasNoSalesAlert = (client.hoursWithoutSales || 0) >= 24;
 
-            return (
-              <div
-                key={client.id}
-                className={`glass-card rounded-2xl p-5 border transition-all duration-300 relative flex flex-col justify-between hover:border-cyan-500/40 ${
-                  isSelected
-                    ? 'border-cyan-400 bg-gradient-to-br from-slate-900/90 via-slate-900/80 to-blue-950/40 shadow-[0_0_20px_rgba(34,211,238,0.12)]'
-                    : 'border-white/10 hover:bg-slate-900/80'
-                }`}
-              >
-                <div>
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <div>
-                      <span className="text-[10px] font-bold tracking-wider uppercase text-cyan-400 block mb-0.5 font-mono">
-                        ID: {client.id}
-                      </span>
-                      <h4 className="text-base font-bold text-white tracking-tight">
-                        {client.name}
-                      </h4>
-                      <p className="text-xs font-semibold text-slate-300 flex items-center gap-1.5 mt-0.5">
-                        <Building2 className="w-3.5 h-3.5 text-blue-400" />
-                        {client.companyName}
-                      </p>
+              return (
+                <div
+                  key={client.id}
+                  className={`glass-card rounded-2xl p-5 border transition-all duration-300 relative flex flex-col justify-between hover:border-cyan-500/40 ${
+                    isSelected
+                      ? 'border-cyan-400 bg-gradient-to-br from-slate-900/90 via-slate-900/80 to-blue-950/40 shadow-[0_0_20px_rgba(34,211,238,0.12)]'
+                      : 'border-white/10 hover:bg-slate-900/80'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div>
+                        <span className="text-[10px] font-bold tracking-wider uppercase text-cyan-400 block mb-0.5 font-mono">
+                          ID: {client.id}
+                        </span>
+                        <h4 className="text-base font-bold text-white tracking-tight">
+                          {client.name}
+                        </h4>
+                        <p className="text-xs font-semibold text-slate-300 flex items-center gap-1.5 mt-0.5">
+                          <Building2 className="w-3.5 h-3.5 text-blue-400" />
+                          {client.companyName}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                            client.status === 'ACTIVE'
+                              ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30'
+                              : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
+                          }`}
+                        >
+                          {client.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}
+                        </span>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setClientToDelete(client);
+                          }}
+                          className="p-1 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                          title="Excluir este cliente"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5">
-                      <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                          client.status === 'ACTIVE'
-                            ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30'
-                            : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
+                    {hasNoSalesAlert && (
+                      <div className="mb-3 p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-300 text-[11px] flex items-center gap-2">
+                        <AlertTriangle className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+                        <span className="font-semibold">Nenhuma venda há +24 horas!</span>
+                      </div>
+                    )}
+
+                    <div className="space-y-1.5 text-xs py-3 border-y border-white/5 text-slate-300">
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-500 flex items-center gap-1.5">
+                          <Mail className="w-3.5 h-3.5 text-slate-400" /> E-mail:
+                        </span>
+                        <span className="font-mono text-slate-200">{client.email}</span>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-500 flex items-center gap-1.5">
+                          <Phone className="w-3.5 h-3.5 text-slate-400" /> Telefone:
+                        </span>
+                        <span className="font-mono text-slate-200">{client.phone}</span>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 pt-3">
+                      <div className="bg-slate-950/60 p-2.5 rounded-xl border border-white/5">
+                        <span className="text-[10px] text-slate-400 uppercase font-semibold block">
+                          Vendas Totais
+                        </span>
+                        <span className="text-sm font-bold text-white flex items-center gap-1 mt-0.5">
+                          <ShoppingBag className="w-3.5 h-3.5 text-cyan-400" />
+                          {client.totalSalesCount || 0}
+                        </span>
+                      </div>
+
+                      <div className="bg-slate-950/60 p-2.5 rounded-xl border border-white/5">
+                        <span className="text-[10px] text-slate-400 uppercase font-semibold block">
+                          Faturamento
+                        </span>
+                        <span className="text-sm font-bold text-cyan-400 mt-0.5 block font-mono">
+                          {formatCurrency(client.totalRevenue || 0)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Botões de Ação do Card */}
+                  <div className="mt-4 pt-3 border-t border-white/5 flex flex-col gap-2">
+                    <button
+                      onClick={() => handleOpenClientDetail(client.id, 'dados')}
+                      className="w-full py-2.5 rounded-xl text-xs font-extrabold bg-gradient-to-r from-blue-600/30 to-cyan-500/30 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/30 transition-all flex items-center justify-center gap-1.5 shadow-sm"
+                    >
+                      <span>Ver Perfil & Configurar Integrações</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => onSelectClient(isSelected ? null : client.id)}
+                        className={`flex-1 py-1.5 rounded-lg text-[11px] font-bold transition-all ${
+                          isSelected
+                            ? 'bg-cyan-500 text-slate-950'
+                            : 'bg-slate-900/60 text-slate-400 hover:text-white'
                         }`}
                       >
-                        {client.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}
-                      </span>
+                        {isSelected ? '✓ Filtrando no Dashboard' : 'Filtrar no Dashboard'}
+                      </button>
 
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setClientToDelete(client);
-                        }}
-                        className="p-1 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                        onClick={() => setClientToDelete(client)}
+                        className="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 transition-all flex items-center gap-1"
                         title="Excluir este cliente"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Excluir</span>
                       </button>
                     </div>
                   </div>
-
-                  {hasNoSalesAlert && (
-                    <div className="mb-3 p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-300 text-[11px] flex items-center gap-2">
-                      <AlertTriangle className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
-                      <span className="font-semibold">Nenhuma venda há +24 horas!</span>
-                    </div>
-                  )}
-
-                  <div className="space-y-1.5 text-xs py-3 border-y border-white/5 text-slate-300">
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-500 flex items-center gap-1.5">
-                        <Mail className="w-3.5 h-3.5 text-slate-400" /> E-mail:
-                      </span>
-                      <span className="font-mono text-slate-200">{client.email}</span>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-500 flex items-center gap-1.5">
-                        <Phone className="w-3.5 h-3.5 text-slate-400" /> Telefone:
-                      </span>
-                      <span className="font-mono text-slate-200">{client.phone}</span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3 pt-3">
-                    <div className="bg-slate-950/60 p-2.5 rounded-xl border border-white/5">
-                      <span className="text-[10px] text-slate-400 uppercase font-semibold block">
-                        Vendas Totais
-                      </span>
-                      <span className="text-sm font-bold text-white flex items-center gap-1 mt-0.5">
-                        <ShoppingBag className="w-3.5 h-3.5 text-cyan-400" />
-                        {client.totalSalesCount || 0}
-                      </span>
-                    </div>
-
-                    <div className="bg-slate-950/60 p-2.5 rounded-xl border border-white/5">
-                      <span className="text-[10px] text-slate-400 uppercase font-semibold block">
-                        Faturamento
-                      </span>
-                      <span className="text-sm font-bold text-cyan-400 mt-0.5 block font-mono">
-                        {formatCurrency(client.totalRevenue || 0)}
-                      </span>
-                    </div>
-                  </div>
                 </div>
-
-                {/* Botões de Ação do Card */}
-                <div className="mt-4 pt-3 border-t border-white/5 flex flex-col gap-2">
-                  <button
-                    onClick={() => handleOpenClientDetail(client.id, 'dados')}
-                    className="w-full py-2.5 rounded-xl text-xs font-extrabold bg-gradient-to-r from-blue-600/30 to-cyan-500/30 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/30 transition-all flex items-center justify-center gap-1.5 shadow-sm"
-                  >
-                    <span>Ver Perfil & Configurar Integrações</span>
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => onSelectClient(isSelected ? null : client.id)}
-                      className={`flex-1 py-1.5 rounded-lg text-[11px] font-bold transition-all ${
-                        isSelected
-                          ? 'bg-cyan-500 text-slate-950'
-                          : 'bg-slate-900/60 text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      {isSelected ? '✓ Filtrando no Dashboard' : 'Filtrar no Dashboard'}
-                    </button>
-
-                    <button
-                      onClick={() => setClientToDelete(client)}
-                      className="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 transition-all flex items-center gap-1"
-                      title="Excluir este cliente"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      <span>Excluir</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     );
   }
