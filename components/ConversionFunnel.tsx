@@ -10,17 +10,17 @@ interface ConversionFunnelProps {
 }
 
 export default function ConversionFunnel({
-  initialClicks = 620,
-  lpViews = 262,
-  checkoutsStarted = 161,
-  approvedSales = 29,
-  monthlyRevenue = 20880,
+  initialClicks = 0,
+  lpViews = 0,
+  checkoutsStarted = 0,
+  approvedSales = 0,
+  monthlyRevenue = 0,
 }: ConversionFunnelProps) {
   // Funnel calculations
-  const lpConversion = ((lpViews / initialClicks) * 100).toFixed(1);
-  const checkoutConversion = ((checkoutsStarted / lpViews) * 100).toFixed(1);
-  const saleConversion = ((approvedSales / checkoutsStarted) * 100).toFixed(1);
-  const overallConversion = ((approvedSales / initialClicks) * 100).toFixed(2);
+  const lpConversion = initialClicks > 0 ? ((lpViews / initialClicks) * 100).toFixed(1) : '0.0';
+  const checkoutConversion = lpViews > 0 ? ((checkoutsStarted / lpViews) * 100).toFixed(1) : '0.0';
+  const saleConversion = checkoutsStarted > 0 ? ((approvedSales / checkoutsStarted) * 100).toFixed(1) : '0.0';
+  const overallConversion = initialClicks > 0 ? ((approvedSales / initialClicks) * 100).toFixed(2) : '0.00';
 
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -35,12 +35,12 @@ export default function ConversionFunnel({
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
-              Alta Conversão
+              Funil de Conversão
             </span>
             <span className="text-xs font-semibold text-slate-400">Meta Ads ➔ Green Checkout</span>
           </div>
           <h3 className="text-xl font-black text-white tracking-tight mt-1 flex items-center gap-2">
-            Funil Imponente de Conversão de Vendas
+            Funil de Conversão de Vendas
           </h3>
         </div>
 
@@ -124,7 +124,11 @@ export default function ConversionFunnel({
         </div>
 
         <div className="text-slate-400 text-[11px]">
-          Desempenho <span className="text-cyan-400 font-bold">28.4% acima</span> da média de mercado do segmento.
+          {approvedSales > 0 ? (
+            <span>Desempenho acompanhado em tempo real.</span>
+          ) : (
+            <span>Aguardando tráfego e vendas reais para análise de desempenho.</span>
+          )}
         </div>
       </div>
     </div>
