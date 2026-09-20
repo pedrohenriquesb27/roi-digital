@@ -218,6 +218,13 @@ export default function Dashboard() {
     setClients((prev) => prev.map((c) => (c.id === updatedClient.id ? updatedClient : c)));
   };
 
+  const handleDeleteClient = (clientId: string) => {
+    setClients((prev) => prev.filter((c) => c.id !== clientId));
+    if (selectedClientId === clientId) {
+      setSelectedClientId(null);
+    }
+  };
+
   const handleUpdateMetaConfig = (newConfig: Partial<MetaApiConfig>) => {
     setMetaConfig((prev) => ({ ...prev, ...newConfig }));
   };
@@ -557,6 +564,7 @@ export default function Dashboard() {
               onSelectClient={setSelectedClientId}
               onAddClient={handleAddClient}
               onUpdateClient={handleUpdateClient}
+              onDeleteClient={handleDeleteClient}
               onAddTransaction={handleAddTransaction}
               metaConfig={metaConfig}
               onUpdateMetaConfig={handleUpdateMetaConfig}
@@ -571,6 +579,7 @@ export default function Dashboard() {
               onSelectClient={setSelectedClientId}
               onAddClient={handleAddClient}
               onUpdateClient={handleUpdateClient}
+              onDeleteClient={handleDeleteClient}
               onAddTransaction={handleAddTransaction}
               metaConfig={metaConfig}
               onUpdateMetaConfig={handleUpdateMetaConfig}
@@ -585,6 +594,7 @@ export default function Dashboard() {
               onSelectClient={setSelectedClientId}
               onAddClient={handleAddClient}
               onUpdateClient={handleUpdateClient}
+              onDeleteClient={handleDeleteClient}
               onAddTransaction={handleAddTransaction}
               metaConfig={metaConfig}
               onUpdateMetaConfig={handleUpdateMetaConfig}

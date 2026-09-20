@@ -29,6 +29,7 @@ import {
   ShieldCheck,
   Sliders,
   FileText,
+  Trash2,
 } from 'lucide-react';
 import MetaSimulatorModal from './MetaSimulatorModal';
 
@@ -41,6 +42,7 @@ interface ClientsSectionProps {
   onSelectClient: (clientId: string | null) => void;
   onAddClient: (newClient: Client) => void;
   onUpdateClient: (updatedClient: Client) => void;
+  onDeleteClient?: (clientId: string) => void;
   onAddTransaction?: (newTx: any) => void;
   metaConfig?: MetaApiConfig;
   onUpdateMetaConfig?: (newConfig: Partial<MetaApiConfig>) => void;
@@ -53,6 +55,7 @@ export default function ClientsSection({
   onSelectClient,
   onAddClient,
   onUpdateClient,
+  onDeleteClient,
   onAddTransaction,
   metaConfig = {
     accessToken: 'EAAG982301984719283719238',
@@ -153,9 +156,27 @@ export default function ClientsSection({
     return () => clearInterval(interval);
   }, []);
 
+  // 7. STATE PARA EXCLUSÃO DE CLIENTE
+  const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
+
   // ----------------------------------------------------
   // HANDLERS
   // ----------------------------------------------------
+
+  // Handler de Confirmação de Exclusão de Cliente
+  const handleConfirmDeleteClient = (client: Client) => {
+    if (onDeleteClient) {
+      onDeleteClient(client.id);
+    }
+    if (selectedClientId === client.id) {
+      onSelectClient(null);
+    }
+    if (activeDetailClientId === client.id) {
+      setActiveDetailClientId(null);
+      setViewState('list');
+    }
+    setClientToDelete(null);
+  };
 
   // Handler para Abrir Perfil do Cliente
   const handleOpenClientDetail = (clientId: string, subTab: DetailSubTab = 'dados') => {
@@ -471,15 +492,28 @@ export default function ClientsSection({
                       </p>
                     </div>
 
-                    <span
-                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                        client.status === 'ACTIVE'
-                          ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30'
-                          : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
-                      }`}
-                    >
-                      {client.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                          client.status === 'ACTIVE'
+                            ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30'
+                            : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
+                        }`}
+                      >
+                        {client.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}
+                      </span>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setClientToDelete(client);
+                        }}
+                        className="p-1 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                        title="Excluir este cliente"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
 
                   {hasNoSalesAlert && (
@@ -537,16 +571,27 @@ export default function ClientsSection({
                     <ChevronRight className="w-4 h-4" />
                   </button>
 
-                  <button
-                    onClick={() => onSelectClient(isSelected ? null : client.id)}
-                    className={`w-full py-1.5 rounded-lg text-[11px] font-bold transition-all ${
-                      isSelected
-                        ? 'bg-cyan-500 text-slate-950'
-                        : 'bg-slate-900/60 text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    {isSelected ? '✓ Filtrando no Dashboard' : 'Filtrar no Dashboard'}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => onSelectClient(isSelected ? null : client.id)}
+                      className={`flex-1 py-1.5 rounded-lg text-[11px] font-bold transition-all ${
+                        isSelected
+                          ? 'bg-cyan-500 text-slate-950'
+                          : 'bg-slate-900/60 text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      {isSelected ? '✓ Filtrando no Dashboard' : 'Filtrar no Dashboard'}
+                    </button>
+
+                    <button
+                      onClick={() => setClientToDelete(client)}
+                      className="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 transition-all flex items-center gap-1"
+                      title="Excluir este cliente"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Excluir</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -743,16 +788,27 @@ export default function ClientsSection({
             </div>
           </div>
 
-          <button
-            onClick={() => onSelectClient(isFilteredInDashboard ? null : currentDetailClient.id)}
-            className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-2 ${
-              isFilteredInDashboard
-                ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20'
-                : 'bg-slate-900 border border-slate-700 text-slate-200 hover:border-cyan-400'
-            }`}
-          >
-            {isFilteredInDashboard ? '✓ Filtrando no Dashboard Global' : 'Filtrar no Dashboard Global'}
-          </button>
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+            <button
+              onClick={() => onSelectClient(isFilteredInDashboard ? null : currentDetailClient.id)}
+              className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-2 ${
+                isFilteredInDashboard
+                  ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20'
+                  : 'bg-slate-900 border border-slate-700 text-slate-200 hover:border-cyan-400'
+              }`}
+            >
+              {isFilteredInDashboard ? '✓ Filtrando no Dashboard Global' : 'Filtrar no Dashboard Global'}
+            </button>
+
+            <button
+              onClick={() => setClientToDelete(currentDetailClient)}
+              className="px-3.5 py-2.5 rounded-xl text-xs font-bold bg-rose-500/10 border border-rose-500/30 text-rose-300 hover:bg-rose-500/20 hover:border-rose-500/50 transition-all flex items-center justify-center gap-1.5"
+              title="Excluir este perfil de cliente"
+            >
+              <Trash2 className="w-4 h-4 text-rose-400" />
+              <span>Excluir Cliente</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1237,6 +1293,65 @@ export default function ClientsSection({
         isOpen={isMetaSimulatorOpen}
         onClose={() => setIsMetaSimulatorOpen(false)}
       />
+
+      {/* Modal de Confirmação de Exclusão de Cliente */}
+      {clientToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
+          <div className="glass-card rounded-2xl max-w-md w-full p-6 border border-rose-500/30 bg-slate-900/95 shadow-2xl space-y-5">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-2xl bg-rose-500/10 text-rose-400 border border-rose-500/30">
+                  <Trash2 className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white tracking-tight">Excluir Perfil do Cliente</h3>
+                  <p className="text-xs text-slate-400">Esta ação removerá o cliente da gestão</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setClientToDelete(null)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-2">
+              <div className="text-slate-300 font-bold">
+                Cliente: <span className="text-white">{clientToDelete.name}</span>
+              </div>
+              {clientToDelete.companyName && (
+                <div className="text-slate-400">
+                  Empresa: <span className="text-slate-200">{clientToDelete.companyName}</span>
+                </div>
+              )}
+              <div className="text-slate-500 font-mono text-[11px]">ID: {clientToDelete.id}</div>
+            </div>
+
+            <p className="text-xs text-rose-300/90 font-medium">
+              ⚠️ Tem certeza que deseja excluir permanentemente este cliente da carteira?
+            </p>
+
+            <div className="pt-3 border-t border-white/10 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setClientToDelete(null)}
+                className="px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 font-bold text-xs hover:bg-slate-800 transition-all"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => handleConfirmDeleteClient(clientToDelete)}
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-rose-500 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-rose-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" />
+                Excluir Definitivamente
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
