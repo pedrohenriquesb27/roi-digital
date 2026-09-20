@@ -26,6 +26,7 @@ import GreenWebhookTab from './GreenWebhookTab';
 import KanbanBoard from './KanbanBoard';
 import SalesReportTab from './SalesReportTab';
 import ScaleSimulatorTab from './ScaleSimulatorTab';
+import UtmBuilderTab from './UtmBuilderTab';
 import NotificationCenter from './NotificationCenter';
 import LoginScreen from './LoginScreen';
 import SplashScreen from './SplashScreen';
@@ -569,6 +570,9 @@ export default function Dashboard() {
               campaigns={metaCampaigns}
             />
           )}
+
+          {/* TAB: GERADOR E CÓDIGOS DE UTM */}
+          {activeTab === 'utm' && <UtmBuilderTab />}
 
           {/* TAB 7: GESTÃO DE CLIENTES & INTEGRAÇÕES UNIFICADAS */}
           {activeTab === 'clients' && (
