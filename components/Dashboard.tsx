@@ -27,6 +27,7 @@ import KanbanBoard from './KanbanBoard';
 import SalesReportTab from './SalesReportTab';
 import ScaleSimulatorTab from './ScaleSimulatorTab';
 import UtmBuilderTab from './UtmBuilderTab';
+import LandingPagesTab from './LandingPagesTab';
 import NotificationCenter from './NotificationCenter';
 import LoginScreen from './LoginScreen';
 import SplashScreen from './SplashScreen';
@@ -549,6 +550,15 @@ export default function Dashboard() {
               campaigns={metaCampaigns}
               config={metaConfig}
               onUpdateConfig={handleUpdateMetaConfig}
+            />
+          )}
+
+          {/* TAB: PERFORMANCE DA PÁGINA (LANDING PAGES) */}
+          {activeTab === 'landing' && (
+            <LandingPagesTab
+              transactions={displayedTransactions}
+              campaigns={metaCampaigns}
+              clients={clients}
             />
           )}
 

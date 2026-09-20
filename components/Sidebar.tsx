@@ -13,6 +13,7 @@ import {
   Zap,
   Tag,
   Link as LinkIcon,
+  Globe,
 } from 'lucide-react';
 import RoiLogo from './RoiLogo';
 
@@ -20,6 +21,7 @@ export type NavTabId =
   | 'overview'
   | 'kanban'
   | 'meta'
+  | 'landing'
   | 'simulator'
   | 'report'
   | 'utm'
@@ -60,6 +62,12 @@ export default function Sidebar({
       label: 'Meta Ads',
       icon: TrendingUp,
       badge: 'Tráfego',
+    },
+    {
+      id: 'landing' as NavTabId,
+      label: 'Performance da Página',
+      icon: Globe,
+      badge: 'Páginas',
     },
     {
       id: 'simulator' as NavTabId,
