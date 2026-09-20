@@ -36,24 +36,30 @@ export default function NotificationCenter({
           </div>
 
           <div className="space-y-2.5 overflow-y-auto max-h-[460px] pr-1">
-            {alerts.map((a) => (
-              <div
-                key={a.id}
-                onClick={() => {
-                  onMarkAsRead(a.id);
-                  if (a.targetTab) onNavigateTab(a.targetTab);
-                }}
-                className={`p-3 rounded-xl border text-xs cursor-pointer transition-all ${
-                  a.isRead ? 'bg-slate-950/60 border-slate-800 text-slate-400' : 'bg-slate-900 border-cyan-500/30 text-white'
-                }`}
-              >
-                <div className="flex justify-between items-center mb-1">
-                  <span className="font-bold text-cyan-300">{a.title}</span>
-                  <span className="text-[10px] text-slate-500">{a.timestamp}</span>
-                </div>
-                <p className="text-[11px] text-slate-300">{a.description}</p>
+            {alerts.length === 0 ? (
+              <div className="p-8 text-center text-xs text-slate-500 font-medium">
+                Nenhum alerta pendente no momento.
               </div>
-            ))}
+            ) : (
+              alerts.map((a) => (
+                <div
+                  key={a.id}
+                  onClick={() => {
+                    onMarkAsRead(a.id);
+                    if (a.targetTab) onNavigateTab(a.targetTab);
+                  }}
+                  className={`p-3 rounded-xl border text-xs cursor-pointer transition-all ${
+                    a.isRead ? 'bg-slate-950/60 border-slate-800 text-slate-400' : 'bg-slate-900 border-cyan-500/30 text-white'
+                  }`}
+                >
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="font-bold text-cyan-300">{a.title}</span>
+                    <span className="text-[10px] text-slate-500">{a.timestamp}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-300">{a.description}</p>
+                </div>
+              ))
+            )}
           </div>
         </div>
 

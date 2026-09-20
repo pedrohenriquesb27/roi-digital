@@ -54,34 +54,40 @@ export default function MetaAdsSection({ campaigns, config }: MetaAdsSectionProp
       {/* Campaigns Table */}
       <div className="glass-card rounded-2xl p-6 border border-white/10 space-y-4">
         <h3 className="text-base font-bold text-white">Campanhas Ativas no Meta Ads</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead>
-              <tr className="border-b border-white/10 text-slate-400">
-                <th className="pb-3 font-semibold">Nome da Campanha</th>
-                <th className="pb-3 font-semibold">Status</th>
-                <th className="pb-3 font-semibold">Investimento</th>
-                <th className="pb-3 font-semibold">Cliques</th>
-                <th className="pb-3 font-semibold">CTR</th>
-                <th className="pb-3 font-semibold">Vendas</th>
-                <th className="pb-3 font-semibold">ROAS</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5">
-              {campaigns.map((c) => (
-                <tr key={c.id} className="hover:bg-slate-900/60">
-                  <td className="py-3.5 font-bold text-white">{c.name}</td>
-                  <td className="py-3.5 font-mono text-cyan-400">{c.status}</td>
-                  <td className="py-3.5 font-mono text-white">{formatCurrency(c.spend)}</td>
-                  <td className="py-3.5 font-mono text-slate-300">{c.clicks}</td>
-                  <td className="py-3.5 font-mono text-slate-300">{c.ctr}%</td>
-                  <td className="py-3.5 font-mono text-cyan-400 font-bold">{c.conversions}</td>
-                  <td className="py-3.5 font-mono font-bold text-cyan-300">{c.roas.toFixed(2)}x</td>
+        {campaigns.length === 0 ? (
+          <div className="p-8 text-center text-xs text-slate-500 font-medium">
+            Nenhuma campanha do Meta Ads sincronizada. Configure as credenciais no perfil do cliente para sincronizar dados em tempo real.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-white/10 text-slate-400">
+                  <th className="pb-3 font-semibold">Nome da Campanha</th>
+                  <th className="pb-3 font-semibold">Status</th>
+                  <th className="pb-3 font-semibold">Investimento</th>
+                  <th className="pb-3 font-semibold">Cliques</th>
+                  <th className="pb-3 font-semibold">CTR</th>
+                  <th className="pb-3 font-semibold">Vendas</th>
+                  <th className="pb-3 font-semibold">ROAS</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {campaigns.map((c) => (
+                  <tr key={c.id} className="hover:bg-slate-900/60">
+                    <td className="py-3.5 font-bold text-white">{c.name}</td>
+                    <td className="py-3.5 font-mono text-cyan-400">{c.status}</td>
+                    <td className="py-3.5 font-mono text-white">{formatCurrency(c.spend)}</td>
+                    <td className="py-3.5 font-mono text-slate-300">{c.clicks}</td>
+                    <td className="py-3.5 font-mono text-slate-300">{c.ctr}%</td>
+                    <td className="py-3.5 font-mono text-cyan-400 font-bold">{c.conversions}</td>
+                    <td className="py-3.5 font-mono font-bold text-cyan-300">{c.roas.toFixed(2)}x</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
