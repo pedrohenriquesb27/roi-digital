@@ -150,6 +150,10 @@ export default function Dashboard() {
 
   const [alerts, setAlerts] = useState<NotificationAlert[]>([]);
   const [metaCampaigns, setMetaCampaigns] = useState<MetaCampaign[]>(mockMetaCampaigns);
+  const [isMetaSyncing, setIsMetaSyncing] = useState(false);
+  const [lastMetaSyncedAt, setLastMetaSyncedAt] = useState<string | null>(null);
+  const [metaSyncError, setMetaSyncError] = useState<string | null>(null);
+  const [metaSyncSuccessMsg, setMetaSyncSuccessMsg] = useState<string | null>(null);
 
   const [metaConfig, setMetaConfig] = useState<MetaApiConfig>({
     accessToken: 'EAAG982301984719283719238',
@@ -157,6 +161,44 @@ export default function Dashboard() {
     pixelId: '98201948102',
     isConnected: true,
   });
+
+  const handleSyncMetaNow = async () => {
+    setIsMetaSyncing(true);
+    setMetaSyncError(null);
+    setMetaSyncSuccessMsg(null);
+
+    const selectedClientObj = clients.find((c) => c.id === selectedClientId);
+    const tokenToUse = selectedClientObj?.metaAccessToken || metaConfig.accessToken;
+    const accountToUse = selectedClientObj?.adAccountId || metaConfig.adAccountId;
+
+    try {
+      const res = await fetch('/api/meta-ads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'sync_campaigns',
+          accessToken: tokenToUse,
+          adAccountId: accountToUse,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (data.campaigns && Array.isArray(data.campaigns)) {
+          setMetaCampaigns(data.campaigns);
+        }
+        const timeStr = new Date().toLocaleTimeString('pt-BR');
+        setLastMetaSyncedAt(timeStr);
+        setMetaSyncSuccessMsg(data.message || `Sincronização concluída com sucesso às ${timeStr}!`);
+        setTimeout(() => setMetaSyncSuccessMsg(null), 5000);
+      } else {
+        setMetaSyncError(data.message || 'Falha ao sincronizar com a Meta Ads Graph API.');
+      }
+    } catch (err: any) {
+      setMetaSyncError('Erro de requisição com a API da Meta: ' + err.message);
+    } finally {
+      setIsMetaSyncing(false);
+    }
+  };
 
   // Filter transactions by selected client if any
   const displayedTransactions = selectedClientId
@@ -550,6 +592,11 @@ export default function Dashboard() {
               campaigns={metaCampaigns}
               config={metaConfig}
               onUpdateConfig={handleUpdateMetaConfig}
+              onSyncMetaNow={handleSyncMetaNow}
+              isSyncing={isMetaSyncing}
+              lastSyncedAt={lastMetaSyncedAt}
+              syncError={metaSyncError}
+              syncSuccessMsg={metaSyncSuccessMsg}
             />
           )}
 
@@ -596,6 +643,10 @@ export default function Dashboard() {
               onAddTransaction={handleAddTransaction}
               metaConfig={metaConfig}
               onUpdateMetaConfig={handleUpdateMetaConfig}
+              onUpdateCampaigns={(newCampaigns) => {
+                setMetaCampaigns(newCampaigns);
+                setLastMetaSyncedAt(new Date().toLocaleTimeString('pt-BR'));
+              }}
               initialSubTab="clients"
             />
           )}
@@ -611,6 +662,10 @@ export default function Dashboard() {
               onAddTransaction={handleAddTransaction}
               metaConfig={metaConfig}
               onUpdateMetaConfig={handleUpdateMetaConfig}
+              onUpdateCampaigns={(newCampaigns) => {
+                setMetaCampaigns(newCampaigns);
+                setLastMetaSyncedAt(new Date().toLocaleTimeString('pt-BR'));
+              }}
               initialSubTab="green"
             />
           )}
@@ -626,6 +681,10 @@ export default function Dashboard() {
               onAddTransaction={handleAddTransaction}
               metaConfig={metaConfig}
               onUpdateMetaConfig={handleUpdateMetaConfig}
+              onUpdateCampaigns={(newCampaigns) => {
+                setMetaCampaigns(newCampaigns);
+                setLastMetaSyncedAt(new Date().toLocaleTimeString('pt-BR'));
+              }}
               initialSubTab="meta"
             />
           )}
